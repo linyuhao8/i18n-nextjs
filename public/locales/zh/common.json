@@ -1,0 +1,20 @@
+{
+  "HomePage": {
+    "title": "歡迎使用",
+    "description": "您的 AI 語音自動化平台。"
+  },
+  "Navbar": {
+    "dashboard": "儀表板",
+    "projects": "專案管理",
+    "contacts": "聯絡人",
+    "tasks": "撥號任務",
+    "logout": "登出"
+  },
+  "Buttons": {
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "新增"
+  }
+}
