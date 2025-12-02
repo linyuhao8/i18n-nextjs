@@ -1,5 +1,5 @@
 import { I18nProvider } from "@/i18n/I18nProvider";
-import { getMessages } from "@/i18n/getMessages";
+import { getMessages } from "@/i18n//getMessages";
 import type { Locale } from "@/i18n/types";
 
 export default async function LocaleLayout(props: unknown) {
@@ -14,13 +14,9 @@ export default async function LocaleLayout(props: unknown) {
   const messages = getMessages(locale);
 
   return (
-    <html lang={locale}>
-      <body>
-        <I18nProvider locale={locale} messages={messages}>
-          {children}
-        </I18nProvider>
-      </body>
-    </html>
+    <I18nProvider locale={locale} messages={messages}>
+      {children}
+    </I18nProvider>
   );
 }
 // SSG才會需要 SEO適合 但這邊都是後台端 所以都SSR不需要

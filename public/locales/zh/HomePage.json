@@ -1,0 +1,14 @@
+{
+  "title": "登入 | AI 智能外撥平台",
+  "description": "登入以管理您的外撥任務、客戶資料與AI通話。",
+  "heading": "歡迎回來",
+  "emailLabel": "電子郵件",
+  "passwordLabel": "密碼",
+  "loginButton": "登入",
+  "loggingIn": "登入中...",
+  "forgotPassword": "忘記密碼？",
+  "noAccount": "還沒有帳號？",
+  "createAccount": "建立帳號",
+  "loginSuccess": "登入成功！",
+  "loginFailed": "登入失敗，請再試一次。"
+}

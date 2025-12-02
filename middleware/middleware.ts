@@ -1,18 +1,25 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export function middleware(request: Request) {
-  const url = new URL(request.url);
-  const { pathname } = url;
+const locales = ["en", "zh"];
+const defaultLocale = "zh";
 
-  // 已有 locale → OK
-  if (pathname.startsWith("/en") || pathname.startsWith("/zh")) {
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // 如果路徑已經包含語系 → 直接通過
+  if (locales.some((locale) => pathname.startsWith(`/${locale}`))) {
     return NextResponse.next();
   }
 
-  // 其他 → redirect /zh
-  return NextResponse.redirect(new URL("/zh" + pathname, request.url));
+  // 否則 → 加上預設語系 zh
+  return NextResponse.redirect(
+    new URL(`/${defaultLocale}${pathname}`, request.url)
+  );
 }
 
 export const config = {
-  matcher: ["/((?!_next).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(png|jpg|jpeg|svg|gif|webp)$).*)",
+  ],
 };

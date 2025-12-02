@@ -19,59 +19,24 @@ import type { Messages } from "./types";
  *    → 再透過 Provider 傳給 Client 共用同一份資料
  */
 export function getMessages(locale: string): Messages {
-  /**
-   * 建立翻譯檔路徑
-   * 它會將所有傳入的字串片段以作業系統特定的路徑分隔符號（在 Windows 上是 \，在 macOS/Linux 上是 /）連接起來
-   * process.cwd():
-   *   - 取得 Next.js 專案運行時的根目錄
-   *   - 這樣就算在不同部署環境（Vercel / Node / Docker）
-   *     都能正確找到 public/locales 位置
-   *
-   * path.join():
-   *   - 用來組合路徑，確保不同 OS（Windows/Mac/Linux）皆能正確解析
-   */
+  const dirPath = path.join(process.cwd(), "public/locales", locale);
 
-  const filePath = path.join(
-    process.cwd(), // Next.js 專案根目錄 web/
-    "public/locales", // 放語系檔案的資料夾
-    locale, // 語言代碼，如 "en" 或 "zh"
-    "common.json" //目前使用固定 namespace: common.json
-  );
-  /*組合成 repo/public/locales/[語言代碼]/common.json */
+  // 取得該語系資料夾下所有 JSON 檔案
+  const files = fs
+    .readdirSync(dirPath)
+    .filter((file) => file.endsWith(".json"));
 
-  /**
-   * 如果該語系的檔案不存在 → 回傳空物件
-   *
-   * 這樣做的原因：
-   *   - 防止因語系消失、路徑錯誤導致 SSR crash
-   *   - maintain robustness（系統穩健性）
-   *
-   * 回傳 {} 適用於 fallback 機制：
-   *   → 沒找到翻譯時，畫面會顯示 key，而不是炸掉
-   */
-  if (!fs.existsSync(filePath)) {
-    return {};
+  const messages: Messages = {}; // ← 用 const！
+
+  for (const file of files) {
+    const filePath = path.join(dirPath, file);
+    const namespace = file.replace(".json", "");
+
+    const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    // 多 namespace 支援 (const 仍然可 mutate)
+    messages[namespace] = data;
   }
 
-  /**
-   * 讀取 JSON 檔並解析成 JavaScript object
-   *
-   * readFileSync():
-   *   - 因為這段執行在 SSR（同步阻塞沒問題，且更安全）
-   *   - 讀取後直接回傳字串內容
-   *
-   * JSON.parse():
-   *   - 將翻譯的 JSON 轉成物件型態
-   *
-   * 回傳格式：
-   *   {
-   *     HomePage: { title: "...", description: "..." },
-   *     Navbar:   { projects: "...", tasks: "..." },
-   *     Buttons:  { save: "..." }
-   *   }
-   *
-   * 注意：這份 messages 會被塞進 Provider
-   * → Client 使用 useI18n 取得同一份資料
-   */
-  return JSON.parse(fs.readFileSync(filePath, "utf-8")) as Messages;
+  return messages;
 }
