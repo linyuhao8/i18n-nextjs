@@ -65,11 +65,10 @@ export function I18nProvider({
 //
 //    ⭐ 找不到翻譯時，用 key 當 fallback（避免畫面壞掉）
 //
+
 export function useI18n(namespace: string) {
-  // 從 Context 取得 SSR 傳入的 { locale, messages }
   const ctx = useContext(I18nContext);
 
-  // 若 context 不存在，代表用戶在 Provider 外使用該 hook → 明確報錯
   if (!ctx) {
     throw new Error("useI18n 必須包在 <I18nProvider> 裡使用");
   }
@@ -80,10 +79,36 @@ export function useI18n(namespace: string) {
   //    const t = useI18n("Navbar"); 這邊是先回傳一個function 但還沒執行
   //    t("projects")   → "專案"。    這邊才是實際執行
   //    t("contacts")   → "聯絡人"
-  //
-  return (key: string): string => {
-    return (
-      ctx.messages?.[namespace]?.[key] ?? key // 如果沒有該 key → 使用 key 本身，避免畫面裂掉
-    );
+  //    t("action.seccess") -> "操作成功" 可接受巢狀結構
+
+  // ⭐ 讓 deepGet 不用 any → 使用 unknown + 型別縮小
+  const deepGet = (obj: unknown, path: string): unknown => {
+    return path.split(".").reduce((cur: unknown, key: string) => {
+      if (
+        cur &&
+        typeof cur === "object" &&
+        key in (cur as Record<string, unknown>)
+      ) {
+        return (cur as Record<string, unknown>)[key];
+      }
+      return undefined;
+    }, obj);
   };
+
+  // ⭐ t(key) → 翻譯結果，一律回傳 string
+  const t = ((key: string): string => {
+    const nsMessages = ctx.messages?.[namespace];
+    const value = deepGet(nsMessages, key);
+
+    if (typeof value === "string") {
+      return value;
+    }
+
+    return key;
+  }) as ((key: string) => string) & { __namespace: string };
+
+  // ⭐ 這樣就不會 any 了（強型別）
+  t.__namespace = namespace;
+
+  return t;
 }

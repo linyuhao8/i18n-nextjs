@@ -1,4 +1,7 @@
 {
   "title": "範例頁面",
-  "fetchedData": "取得的 API 資料"
+  "fetchedData": "取得的 API 資料",
+  "action": {
+    "hello": "測試巢狀結構(action.hello)"
+  }
 }

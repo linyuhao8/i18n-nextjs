@@ -1,4 +1,7 @@
 {
   "title": "Example Page",
-  "fetchedData": "Fetched API Data"
+  "fetchedData": "Fetched API Data",
+  "action": {
+    "hello": "Testing nested structures(action.hello)"
+  }
 }
